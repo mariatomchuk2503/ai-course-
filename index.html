@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ШІ для педагогів — навчальний курс</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ШАПКА З ВКЛАДКАМИ -->
+  <header class="header">
+    <div class="container header__inner">
+      <a href="#home" class="logo" data-go="home"><span class="logo__mark">ШІ</span> Курс для педагогів</a>
+      <nav class="tabs-nav" role="tablist" aria-label="Розділи курсу">
+        <button class="nav-tab" role="tab" data-tab="home">Мій курс</button>
+        <button class="nav-tab" role="tab" data-tab="modules">Модулі</button>
+        <button class="nav-tab" role="tab" data-tab="routes">Маршрути</button>
+        <button class="nav-tab" role="tab" data-tab="test">Тест</button>
+        <button class="nav-tab" role="tab" data-tab="help">Словничок</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+
+    <!-- ВКЛАДКА 1: МІЙ КУРС -->
+    <section class="panel" id="panel-home" role="tabpanel">
+      <h1 class="page-title">Вітаємо на курсі!</h1>
+      <p class="page-lead">Тут ви навчитеся готувати завдання з ШІ, перевіряти його відповіді і разом із колегами зробити міжпредметний проєкт для своїх учнів. 10 тижнів, близько 3 годин на тиждень.</p>
+
+      <div class="dash">
+        <div class="card">
+          <span class="label">Ваш маршрут</span>
+          <b class="big" id="dash-route">Ще не визначено</b>
+          <p class="muted" id="dash-route-text">Пройдіть короткий тест, і ми підберемо завдання під ваш рівень.</p>
+          <button class="btn btn--small" data-go="test" id="dash-route-btn">Пройти тест</button>
+        </div>
+        <div class="card">
+          <span class="label">Ваш прогрес</span>
+          <b class="big" id="dash-progress">0 %</b>
+          <div class="progress"><div class="progress__bar" id="dash-bar"></div></div>
+          <p class="muted" id="dash-progress-text">Виконано 0 кроків</p>
+        </div>
+        <div class="card card--accent">
+          <span class="label">Що робити далі</span>
+          <b class="next" id="dash-next">Пройти вхідний тест</b>
+          <p class="muted" id="dash-next-module"></p>
+          <button class="btn btn--small" id="dash-next-btn">Відкрити</button>
+        </div>
+      </div>
+
+      <h2 class="section-title">Як проходить навчання</h2>
+      <div class="how">
+        <div class="how__item"><span class="how__icon">1</span><b>Раз на тиждень — зустріч у Zoom</b><p>45 хвилин. Починаємо з короткої вправи на настрій, далі — практика.</p></div>
+        <div class="how__item"><span class="how__icon">2</span><b>Завдання у зручний час</b><p>У Google Classroom. Кожне завдання — це матеріал, який ви одразу візьмете на урок.</p></div>
+        <div class="how__item"><span class="how__icon">3</span><b>Фінал — живе свято проєктів</b><p>На останній зустрічі команди показують свої проєкти. Без страшних екзаменів.</p></div>
+      </div>
+
+      <h2 class="section-title">Розклад по тижнях</h2>
+      <ol class="timeline" id="timeline"></ol>
+    </section>
+
+    <!-- ВКЛАДКА 2: МОДУЛІ -->
+    <section class="panel" id="panel-modules" role="tabpanel" hidden>
+      <h1 class="page-title">Модулі курсу</h1>
+      <p class="page-lead">Оберіть модуль, щоб побачити, що в ньому буде. Позначайте виконані кроки — прогрес збережеться.</p>
+      <div class="modules-layout">
+        <ul class="module-list" id="module-list"></ul>
+        <article class="module-detail" id="module-detail"></article>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 3: МАРШРУТИ -->
+    <section class="panel" id="panel-routes" role="tabpanel" hidden>
+      <h1 class="page-title">Три маршрути</h1>
+      <p class="page-lead">Усі вивчають одне й те саме, але з різною кількістю підказок. Маршрут визначає тест, а викладач його підтверджує. Змінити маршрут можна будь-коли.</p>
+      <div class="route-tabs" role="tablist">
+        <button class="route-tab" data-route="A">А · Починаю</button>
+        <button class="route-tab" data-route="B">Б · Вже пробую</button>
+        <button class="route-tab" data-route="C">В · Впевнено користуюсь</button>
+      </div>
+      <div class="route-card">
+        <div>
+          <span class="label" id="route-score"></span>
+          <h2 id="route-name"></h2>
+          <p class="muted" id="route-who"></p>
+        </div>
+        <div class="route-card__grid">
+          <div><span class="label">Які завдання</span><p id="route-tasks"></p></div>
+          <div><span class="label">Скільки підказок</span><p id="route-support"></p></div>
+          <div><span class="label">Ваша роль у команді</span><p id="route-role"></p></div>
+        </div>
+      </div>
+      <h2 class="section-title">Курс підлаштовується під вас</h2>
+      <ul class="rules">
+        <li><b>Не вийшло завдання?</b> Отримаєте додаткові пояснення і тренувальні вправи.</li>
+        <li><b>Все легко?</b> Можна пропустити базові вправи і йти далі.</li>
+        <li><b>Давно не заходили?</b> Викладач нагадає і запропонує допомогу.</li>
+        <li><b>Проєкт робите не самі,</b> а в команді з колегами інших предметів.</li>
+      </ul>
+    </section>
+
+    <!-- ВКЛАДКА 4: ТЕСТ -->
+    <section class="panel" id="panel-test" role="tabpanel" hidden>
+      <div class="narrow">
+        <h1 class="page-title">Вхідний тест</h1>
+        <p class="page-lead">12 коротких питань, близько 10 хвилин. Це не оцінка: тест лише допомагає підібрати ваш маршрут.</p>
+        <div class="progress"><div class="progress__bar" id="test-bar"></div></div>
+        <p class="muted small" id="test-progress">Відповідей: 0 з 12</p>
+        <form id="test-form" class="test"></form>
+        <button type="submit" form="test-form" class="btn btn--wide" id="test-submit" disabled>Показати результат</button>
+        <div id="test-result" class="result" hidden></div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 5: СЛОВНИЧОК -->
+    <section class="panel" id="panel-help" role="tabpanel" hidden>
+      <h1 class="page-title">Словничок</h1>
+      <p class="page-lead">Прості пояснення слів, які трапляються в курсі. Натисніть на слово.</p>
+      <input type="search" id="help-search" class="search" placeholder="Пошук слова…" aria-label="Пошук у словничку">
+      <div class="glossary" id="glossary"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>Авторка курсу: Марія Суровицька</span>
+      <span>Старт: [ДАТА] · Питання: [ЕЛ. ПОШТА]</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
