@@ -14,22 +14,36 @@
   <header class="header">
     <div class="container header__inner">
       <a href="#home" class="logo" data-go="home"><span class="logo__mark">ШІ</span> Курс для педагогів</a>
+      <button class="account-btn" id="account-btn" data-go="account">
+        <span class="account-btn__avatar" id="account-avatar">?</span>
+        <span id="account-label">Увійти</span>
+      </button>
       <nav class="tabs-nav" role="tablist" aria-label="Розділи курсу">
         <button class="nav-tab" role="tab" data-tab="home">Мій курс</button>
         <button class="nav-tab" role="tab" data-tab="modules">Модулі</button>
         <button class="nav-tab" role="tab" data-tab="routes">Маршрути</button>
         <button class="nav-tab" role="tab" data-tab="test">Тест</button>
-        <button class="nav-tab" role="tab" data-tab="help">Словничок</button>
+        <button class="nav-tab" role="tab" data-tab="resources">Ресурси</button>
+        <button class="nav-tab" role="tab" data-tab="glossary">Словничок</button>
+        <button class="nav-tab" role="tab" data-tab="help">Допомога</button>
       </nav>
     </div>
   </header>
 
+  <!-- Сповіщення (значки, збереження) -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
   <main class="container main">
 
-    <!-- ВКЛАДКА 1: МІЙ КУРС -->
+    <!-- ВКЛАДКА: МІЙ КУРС (особистий кабінет) -->
     <section class="panel" id="panel-home" role="tabpanel">
-      <h1 class="page-title">Вітаємо на курсі!</h1>
+      <h1 class="page-title" id="home-title">Вітаємо на курсі!</h1>
       <p class="page-lead">Тут ви навчитеся готувати завдання з ШІ, перевіряти його відповіді і разом із колегами зробити міжпредметний проєкт для своїх учнів. 10 тижнів, близько 3 годин на тиждень.</p>
+
+      <div class="banner" id="guest-banner">
+        <div><b>Ви не увійшли в акаунт.</b> Прогрес зберігається лише в цьому браузері. Зареєструйтеся, щоб він зберігався в особистому кабінеті й був доступний з будь-якого пристрою.</div>
+        <button class="btn btn--small" data-go="account">Увійти або зареєструватися</button>
+      </div>
 
       <div class="dash">
         <div class="card">
@@ -43,6 +57,7 @@
           <b class="big" id="dash-progress">0 %</b>
           <div class="progress"><div class="progress__bar" id="dash-bar"></div></div>
           <p class="muted" id="dash-progress-text">Виконано 0 кроків</p>
+          <p class="muted small" id="dash-scores"></p>
         </div>
         <div class="card card--accent">
           <span class="label">Що робити далі</span>
@@ -51,6 +66,14 @@
           <button class="btn btn--small" id="dash-next-btn">Відкрити</button>
         </div>
       </div>
+
+      <h2 class="section-title">Прогрес по модулях</h2>
+      <div class="mod-progress" id="mod-progress"></div>
+
+      <h2 class="section-title">Мої значки</h2>
+      <div class="badges" id="badges"></div>
+
+      <div class="cert-teaser" id="cert-teaser"></div>
 
       <h2 class="section-title">Як проходить навчання</h2>
       <div class="how">
@@ -63,17 +86,17 @@
       <ol class="timeline" id="timeline"></ol>
     </section>
 
-    <!-- ВКЛАДКА 2: МОДУЛІ -->
+    <!-- ВКЛАДКА: МОДУЛІ -->
     <section class="panel" id="panel-modules" role="tabpanel" hidden>
       <h1 class="page-title">Модулі курсу</h1>
-      <p class="page-lead">Оберіть модуль, щоб побачити, що в ньому буде. Позначайте виконані кроки — прогрес збережеться.</p>
+      <p class="page-lead">Оберіть модуль, щоб побачити його програму. Позначайте виконані кроки — прогрес збережеться.</p>
       <div class="modules-layout">
         <ul class="module-list" id="module-list"></ul>
         <article class="module-detail" id="module-detail"></article>
       </div>
     </section>
 
-    <!-- ВКЛАДКА 3: МАРШРУТИ -->
+    <!-- ВКЛАДКА: МАРШРУТИ -->
     <section class="panel" id="panel-routes" role="tabpanel" hidden>
       <h1 class="page-title">Три маршрути</h1>
       <p class="page-lead">Усі вивчають одне й те саме, але з різною кількістю підказок. Маршрут визначає тест, а викладач його підтверджує. Змінити маршрут можна будь-коли.</p>
@@ -87,6 +110,7 @@
           <span class="label" id="route-score"></span>
           <h2 id="route-name"></h2>
           <p class="muted" id="route-who"></p>
+          <button class="btn btn--small btn--ghost route-choose" id="route-choose">Обрати цей маршрут</button>
         </div>
         <div class="route-card__grid">
           <div><span class="label">Які завдання</span><p id="route-tasks"></p></div>
@@ -103,11 +127,11 @@
       </ul>
     </section>
 
-    <!-- ВКЛАДКА 4: ТЕСТ -->
+    <!-- ВКЛАДКА: ТЕСТ -->
     <section class="panel" id="panel-test" role="tabpanel" hidden>
       <div class="narrow">
-        <h1 class="page-title">Вхідний тест</h1>
-        <p class="page-lead">12 коротких питань, близько 10 хвилин. Це не оцінка: тест лише допомагає підібрати ваш маршрут.</p>
+        <h1 class="page-title">Тест ШІ-грамотності</h1>
+        <p class="page-lead" id="test-lead">12 коротких питань, близько 10 хвилин. Це не оцінка: тест лише допомагає підібрати ваш маршрут.</p>
         <div class="progress"><div class="progress__bar" id="test-bar"></div></div>
         <p class="muted small" id="test-progress">Відповідей: 0 з 12</p>
         <form id="test-form" class="test"></form>
@@ -116,23 +140,139 @@
       </div>
     </section>
 
-    <!-- ВКЛАДКА 5: СЛОВНИЧОК -->
-    <section class="panel" id="panel-help" role="tabpanel" hidden>
+    <!-- ВКЛАДКА: РЕСУРСИ -->
+    <section class="panel" id="panel-resources" role="tabpanel" hidden>
+      <h1 class="page-title">Ресурси</h1>
+      <p class="page-lead">Пам'ятки, шаблони запитів та інструменти, які знадобляться в курсі й на ваших уроках.</p>
+      <div class="res-nav">
+        <a href="#res-traffic" class="chip">Світлофор ШІ</a>
+        <a href="#res-prompt" class="chip">Як скласти запит</a>
+        <a href="#res-errors" class="chip">6 типів помилок</a>
+        <a href="#res-agreement" class="chip">Домовленість з класом</a>
+        <a href="#res-tools" class="chip">Інструменти</a>
+      </div>
+      <div id="resources"></div>
+    </section>
+
+    <!-- ВКЛАДКА: СЛОВНИЧОК -->
+    <section class="panel" id="panel-glossary" role="tabpanel" hidden>
       <h1 class="page-title">Словничок</h1>
       <p class="page-lead">Прості пояснення слів, які трапляються в курсі. Натисніть на слово.</p>
       <input type="search" id="help-search" class="search" placeholder="Пошук слова…" aria-label="Пошук у словничку">
       <div class="glossary" id="glossary"></div>
     </section>
 
+    <!-- ВКЛАДКА: ДОПОМОГА (контакти, FAQ, відгук) -->
+    <section class="panel" id="panel-help" role="tabpanel" hidden>
+      <h1 class="page-title">Допомога</h1>
+      <p class="page-lead">Відповіді на часті запитання і як зв'язатися з викладачем.</p>
+      <div class="help-grid">
+        <div class="card" id="contacts"></div>
+        <div class="card">
+          <span class="label">Відгук про курс</span>
+          <b class="next">Що вам сподобалося, а що варто покращити?</b>
+          <p class="muted">Ваш відгук допоможе зробити курс кращим для наступних груп.</p>
+          <a class="btn btn--small" id="feedback-btn" target="_blank" rel="noopener">Залишити відгук</a>
+        </div>
+      </div>
+      <h2 class="section-title">Часті запитання</h2>
+      <div class="faq" id="faq"></div>
+    </section>
+
+    <!-- ВХІД І РЕЄСТРАЦІЯ -->
+    <section class="panel" id="panel-account" role="tabpanel" hidden>
+      <div class="narrow auth">
+        <!-- Якщо Firebase не налаштовано -->
+        <div class="banner banner--warn" id="auth-off" hidden>
+          <div><b>Реєстрація ще не підключена.</b> Поки що прогрес зберігається лише в цьому браузері. Викладач курсу підключить акаунти найближчим часом.</div>
+        </div>
+
+        <!-- Форми входу і реєстрації -->
+        <div id="auth-forms">
+          <div class="auth-tabs">
+            <button class="route-tab is-active" data-auth="login">Вхід</button>
+            <button class="route-tab" data-auth="register">Реєстрація</button>
+          </div>
+
+          <form class="form" id="form-login">
+            <h1 class="page-title">Вхід</h1>
+            <label class="field">Email<input type="email" name="email" autocomplete="email" required></label>
+            <label class="field">Пароль<input type="password" name="password" autocomplete="current-password" required></label>
+            <button class="btn btn--wide" type="submit">Увійти</button>
+            <button class="link-btn" type="button" id="forgot-btn">Забули пароль?</button>
+          </form>
+
+          <form class="form" id="form-register" hidden>
+            <h1 class="page-title">Реєстрація</h1>
+            <label class="field">Ім'я та прізвище<input type="text" name="name" autocomplete="name" required maxlength="80"></label>
+            <label class="field">Предмет, який ви викладаєте<input type="text" name="subject" maxlength="80" placeholder="наприклад, математика"></label>
+            <label class="field">Email<input type="email" name="email" autocomplete="email" required></label>
+            <label class="field">Пароль (щонайменше 6 символів)<input type="password" name="password" autocomplete="new-password" minlength="6" required></label>
+            <label class="check check--top"><input type="checkbox" name="agree" required> <span>Погоджуюся з <a href="#privacy" data-go="privacy">умовами зберігання даних</a></span></label>
+            <button class="btn btn--wide" type="submit">Зареєструватися</button>
+          </form>
+          <p class="form-msg" id="auth-msg" role="alert"></p>
+        </div>
+
+        <!-- Профіль (коли користувач увійшов) -->
+        <div id="profile" hidden>
+          <h1 class="page-title">Мій профіль</h1>
+          <form class="form" id="form-profile">
+            <label class="field">Email<input type="email" id="profile-email" disabled></label>
+            <label class="field">Ім'я та прізвище<input type="text" name="name" required maxlength="80"></label>
+            <label class="field">Предмет<input type="text" name="subject" maxlength="80"></label>
+            <button class="btn" type="submit">Зберегти</button>
+          </form>
+          <p class="form-msg" id="profile-msg" role="status"></p>
+          <div class="profile-actions">
+            <button class="btn btn--ghost" data-go="home">До мого курсу</button>
+            <button class="btn btn--ghost" id="logout-btn">Вийти</button>
+          </div>
+          <p class="muted small">Щоб видалити акаунт і всі дані, напишіть викладачу (розділ «Допомога»).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- СВІДОЦТВО -->
+    <section class="panel" id="panel-certificate" role="tabpanel" hidden>
+      <div id="certificate"></div>
+    </section>
+
+    <!-- КОНФІДЕНЦІЙНІСТЬ -->
+    <section class="panel" id="panel-privacy" role="tabpanel" hidden>
+      <div class="narrow prose">
+        <h1 class="page-title">Як ми зберігаємо ваші дані</h1>
+        <h3>Які дані зберігаються</h3>
+        <p>Ім'я, email, предмет, який ви викладаєте, результати тесту, обраний маршрут і позначки про виконані кроки курсу.</p>
+        <h3>Де вони зберігаються</h3>
+        <p>Якщо ви зареєструвалися — у захищеній базі даних Google Firebase. Якщо ні — лише у вашому браузері на цьому пристрої.</p>
+        <h3>Хто їх бачить</h3>
+        <p>Ви — у своєму кабінеті. Викладач курсу — для супроводу навчання (перевірити маршрут, нагадати про завдання). Дані не передаються третім особам і не використовуються для реклами.</p>
+        <h3>Пароль</h3>
+        <p>Пароль зберігає Google у зашифрованому вигляді. Викладач його не бачить.</p>
+        <h3>Як видалити дані</h3>
+        <p>Напишіть викладачу на email з розділу «Допомога» — акаунт і всі дані буде видалено. Дані в браузері можна стерти, очистивши дані сайту в налаштуваннях браузера.</p>
+        <h3>Важливо</h3>
+        <p>Не додавайте на сайт і в ШІ-сервіси персональні дані своїх учнів.</p>
+        <button class="btn btn--ghost" onclick="history.back()">Назад</button>
+      </div>
+    </section>
+
   </main>
 
   <footer class="footer">
     <div class="container footer__inner">
-      <span>Авторка курсу: Марія Суровицька</span>
-      <span>Старт: 14.12 · Питання: mariatomchuk2503@gmail.com </span>
+      <span id="footer-left">Курс розробила Марія Суровицька</span>
+      <span class="footer__links">
+        <a href="#help" data-go="help">Контакти</a>
+        <a href="#privacy" data-go="privacy">Конфіденційність</a>
+      </span>
     </div>
   </footer>
 
+  <script src="firebase-config.js"></script>
+  <script src="data.js"></script>
   <script src="script.js"></script>
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
