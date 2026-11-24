@@ -1,242 +1,108 @@
 // =============================================================
-//  ДАНІ КУРСУ
-//  Щоб змінити текст на сайті — правте його тут.
+//  ЛОГІКА САЙТУ
+//  Зміст курсу — у data.js, налаштування — у firebase-config.js
 // =============================================================
-
-// ----- Маршрути -----
-const ROUTES = {
-  A: {
-    short: "А · Починаю",
-    score: "0–4 бали в тесті",
-    name: "Маршрут А — «Починаю»",
-    who: "Для тих, хто тільки знайомиться з ШІ або пробував його кілька разів.",
-    tasks: "Прості: одну тему розглядаємо з погляду кількох предметів.",
-    support: "Багато: готові шаблони запитів і покрокові інструкції.",
-    role: "Учасник команди з чіткою невеликою частиною роботи.",
-    tip: "Беріть готові шаблони запитів і змінюйте в них лише тему та клас."
-  },
-  B: {
-    short: "Б · Вже пробую",
-    score: "5–8 балів у тесті",
-    name: "Маршрут Б — «Вже пробую»",
-    who: "Для тих, хто вже користується ШІ, але поки без системи.",
-    tasks: "Середні: прийом з одного предмета допомагає розв'язати задачу іншого.",
-    support: "Помірно: шаблони-підказки, які ви доповнюєте самі.",
-    role: "Відповідаєте за свою частину проєкту.",
-    tip: "Доповнюйте шаблони своїм контекстом: рівень групи, мета, формат."
-  },
-  C: {
-    short: "В · Впевнено користуюсь",
-    score: "9–12 балів у тесті",
-    name: "Маршрут В — «Впевнено користуюсь»",
-    who: "Для тих, хто впевнено працює з ШІ й готовий допомагати колегам.",
-    tasks: "Складні: реальна життєва проблема, де предмети працюють разом.",
-    support: "Мінімум: лише вимоги до результату, решту вирішуєте самі.",
-    role: "Лідер команди: організовуєте роботу і допомагаєте колегам.",
-    tip: "Складайте власні запити, діліться ними в банку запитів курсу."
-  }
-};
-
-// ----- Модулі: кожен містить кроки (зустрічі, завдання, результат) -----
-// type: "meet" — зустріч у Zoom, "self" — самостійно, "consult" — консультація, "live" — очна зустріч
-const MODULES = [
-  {
-    id: "m0", code: "М0", title: "Знайомство і тест", weeks: "Тиждень 1", hours: 1,
-    goal: "Дізнатися, з чого ви починаєте, і підібрати ваш маршрут.",
-    result: "Ваш маршрут А, Б або В",
-    steps: [
-      { type: "self", title: "Коротка анкета", time: "10 хв", text: "Кілька питань про ваш досвід, предмети і те, чого хочете навчитися." },
-      { type: "self", title: "Вхідний тест", time: "10 хв", text: "12 питань про ШІ. Це не оцінка — тест лише підбирає маршрут.", action: "test" },
-      { type: "self", title: "«Мій ШІ-портрет»", time: "20 хв", text: "Три записи на спільній дошці Padlet: що ви вже знаєте про ШІ, що вас непокоїть і чого чекаєте від курсу." }
-    ]
-  },
-  {
-    id: "m1", code: "М1", title: "Як думає машина", weeks: "Тижні 1–2", hours: 4,
-    goal: "Зрозуміти, як ШІ створює відповіді, чому помиляється і як ним користуватися безпечно.",
-    result: "Пам'ятка «Світлофор ШІ» для вашого закладу",
-    steps: [
-      { type: "meet", title: "Зустріч «Як думає машина»", time: "45 хв", list: [
-        "Вправа на настрій і знайомство",
-        "Гра Quick, Draw!: бачимо, як ШІ вчиться впізнавати малюнки",
-        "Обговорюємо: чому ШІ вгадав одне і не вгадав інше",
-        "Просто про головне: як ШІ складає текст, що таке «галюцинації» і упередженість",
-        "Робочий аркуш «Перевірка здорового глузду»: ставимо ШІ каверзні питання"
-      ]},
-      { type: "consult", title: "Консультація «Запитання — відповіді»", time: "Тиждень 2", text: "Розбираємо все, що залишилось незрозумілим." },
-      { type: "self", title: "Пам'ятка «Світлофор ШІ»", time: "1,5 год", text: "Зелене — можна сміливо (ідеї, чернетки), жовте — тільки після перевірки (факти, цифри), червоне — не можна (персональні дані учнів)." },
-      { type: "self", title: "Самоперевірка", time: "15 хв", text: "6 коротких питань, щоб переконатися, що все зрозуміло." }
-    ]
-  },
-  {
-    id: "m2", code: "М2", title: "Створюємо матеріали з ШІ", weeks: "Тижні 3–4", hours: 6,
-    goal: "Навчитися писати хороші запити і робити з ШІ завдання різного рівня та наочність.",
-    result: "Набір завдань трьох рівнів з вашої теми + картинка чи схема до нього",
-    steps: [
-      { type: "meet", title: "Зустріч «Від поганого запиту до хорошого»", time: "45 хв", list: [
-        "Пишемо короткий запит «Склади 5 задач з теми…» і дивимось, що вийшло",
-        "Шукаємо, чого бракує у відповіді",
-        "Формула хорошого запиту: роль → контекст → завдання → формат → критерії",
-        "У парах з колегою іншого предмета переписуємо запит",
-        "2–3 пари показують свої «до» і «після»"
-      ]},
-      { type: "meet", title: "Зустріч «Наочність за 15 хвилин»", time: "45 хв", list: [
-        "Один запит — три різні генератори зображень: порівнюємо",
-        "Як описати картинку, щоб ШІ зрозумів",
-        "Робота на станціях: створюємо наочність до своєї теми",
-        "Викладаємо роботи на спільну дошку"
-      ]},
-      { type: "self", title: "Завдання трьох рівнів", time: "2 год", text: "Візьміть свою тему і зробіть з ШІ завдання для слабших, середніх і сильніших учнів. Адаптуйте одне завдання для учнів з особливими освітніми потребами." },
-      { type: "self", title: "Наочність до теми", time: "2 год", text: "Зробіть картинку, схему чи інфографіку до своїх завдань." }
-    ]
-  },
-  {
-    id: "m3", code: "М3", title: "Перевіряємо ШІ", weeks: "Тиждень 5", hours: 4,
-    goal: "Звикнути перевіряти все, що видає ШІ, і домовитися з учнями про чесне використання ШІ.",
-    result: "Чек-лист перевірки + правила роботи з ШІ для вашої групи",
-    steps: [
-      { type: "meet", title: "Зустріч «Знайди помилку»", time: "45 хв", list: [
-        "Вправа «Помилка, яка мене навчила»",
-        "Набір А: тексти від ШІ, у яких сховані помилки, — шукаємо",
-        "6 типів помилок ШІ і як кожну перевірити",
-        "Тренуємось на картках",
-        "Набір Б: перевіряємо себе ще раз — помилок знаходимо більше"
-      ]},
-      { type: "consult", title: "Консультація", time: "1 год", text: "Розбираємо складні випадки з вашої практики." },
-      { type: "self", title: "Чек-лист перевірки", time: "1 год", text: "Короткий список: що перевірити, перш ніж давати матеріал від ШІ учням." },
-      { type: "self", title: "Домовленість з учнями", time: "1 год", text: "Прості правила для вашої групи: коли можна користуватися ШІ і як про це чесно сказати." }
-    ]
-  },
-  {
-    id: "m4", code: "М4", title: "Міжпредметний міст", weeks: "Тиждень 6", hours: 5,
-    goal: "Знайти з ШІ, як ваша тема пов'язана з іншими предметами, і зробити з цього завдання.",
-    result: "Карта зв'язків вашої теми + одне міжпредметне завдання",
-    steps: [
-      { type: "meet", title: "Зустріч «Міжпредметний міст»", time: "45 хв", list: [
-        "Вправа «Павутина»: як усе пов'язане",
-        "Завдання «Міжпредметний міст»: шукаємо з ШІ, де ваша тема перетинається з іншими",
-        "Які зв'язки справжні, а які притягнуті за вуха",
-        "Три рівні: поруч, разом, у реальній проблемі — на прикладах",
-        "Збираємо команди для проєкту"
-      ]},
-      { type: "consult", title: "Консультація", time: "1 год", text: "Допомога командам з вибором теми." },
-      { type: "self", title: "Карта зв'язків і завдання", time: "3 год, у команді", text: "Разом з колегами інших предметів малюєте карту зв'язків теми і складаєте міжпредметне завдання." }
-    ]
-  },
-  {
-    id: "m5", code: "М5", title: "Проєкт у команді", weeks: "Тижні 7–9", hours: 8,
-    goal: "У команді з колегами створити міжпредметне заняття чи проєкт для своїх учнів.",
-    result: "Готовий сценарій заняття або проєкту",
-    steps: [
-      { type: "meet", title: "Зустріч «Студія проєктів»", time: "45 хв", list: [
-        "Вправа «Подяка колезі»",
-        "5 форматів на вибір: урок, квест чи кейс, ШІ-помічник для учнів, подкаст чи відео, STEM-проєкт",
-        "Команди обирають формат",
-        "«Ліфтова презентація»: 2 хвилини про ідею",
-        "Консультації з кожною командою"
-      ]},
-      { type: "consult", title: "Тиждень 8: проміжний звіт", time: "Консультація", text: "Показуєте, що вже зроблено, і отримуєте поради." },
-      { type: "self", title: "Тиждень 9: готовий продукт", time: "6 год, у команді", text: "Доводите проєкт до кінця і оцінюєте роботи інших команд." }
-    ]
-  },
-  {
-    id: "m6", code: "М6", title: "Галерея проєктів", weeks: "Тиждень 10", hours: 2,
-    goal: "Показати свій проєкт, побачити свій прогрес і вирішити, що робити далі.",
-    result: "Захищений проєкт, особистий план і сертифікат",
-    steps: [
-      { type: "live", title: "Очна зустріч «Галерея проєктів»", time: "2 год", list: [
-        "Вправа «Моя зона стійкості»",
-        "Кожна команда: до 7 хвилин презентації і 3 хвилини запитань",
-        "Повторний тест — порівнюємо з початком",
-        "«Повернення до портрета»: що змінилось від першого тижня",
-        "Особистий план: що вже застосовую, що застосую далі",
-        "Сертифікати"
-      ]}
-    ]
-  }
-];
-
-// ----- Питання тесту (correct — номер правильної відповіді, рахуємо з 0) -----
-const QUESTIONS = [
-  { q: "Як працює ШІ-чат, коли пише відповідь?",
-    a: ["Шукає готову відповідь в інтернеті", "Підбирає найімовірніші наступні слова на основі текстів, на яких навчався", "Розуміє тему так само, як людина", "Спершу перевіряє факти, потім відповідає"], correct: 1 },
-  { q: "Що таке «галюцинація» ШІ?",
-    a: ["Збій програми", "Відповідь, яка звучить правдиво, але насправді вигадана", "Відмова відповідати", "Надто довга відповідь"], correct: 1 },
-  { q: "Чому на те саме питання ШІ може відповісти по-різному?",
-    a: ["Бо відповідь щоразу складається наново, з елементом випадковості", "Бо ШІ втомлюється", "Це завжди означає помилку", "Бо відповідь залежить від часу доби"], correct: 0 },
-  { q: "Який запит дасть найкращі завдання?",
-    a: ["«Склади завдання з електротехніки»",
-        "«Ти методист. Склади 5 задач з електротехніки для 2 курсу (електромонтаж), середній рівень, з розв'язками та критеріями оцінювання»",
-        "«Електротехніка, задачі, швидко»",
-        "«Придумай щось цікаве для студентів»"], correct: 1 },
-  { q: "Відповідь ШІ вам не підійшла. Що краще зробити?",
-    a: ["Взяти як є", "Вирішити, що ШІ не годиться", "Уточнити запит: додати подробиці, приклад, бажаний вигляд відповіді", "Кілька разів надіслати той самий запит"], correct: 2 },
-  { q: "Що найбільше допоможе ШІ зробити матеріал саме для вашої групи?",
-    a: ["Рівень групи, мета заняття і яким має бути результат", "Лише тема", "Лише обсяг тексту", "Нічого додавати не треба"], correct: 0 },
-  { q: "ШІ послався на наукову статтю. Що робите?",
-    a: ["Використовую як є", "Перевіряю, чи така стаття існує і чи там справді це написано", "Довіряю, якщо звучить солідно", "Прошу ШІ підтвердити, що стаття справжня"], correct: 1 },
-  { q: "Як перевірити задачу з розрахунками, яку склав ШІ?",
-    a: ["Довіритися — ШІ добре рахує", "Розв'язати самому або звірити з надійним джерелом", "Спитати той самий ШІ, чи все правильно", "Прості задачі перевіряти не треба"], correct: 1 },
-  { q: "Чи може ШІ бути упередженим?",
-    a: ["Ні, ніколи", "Так, бо він учився на текстах, де бувають стереотипи", "Лише в безкоштовних версіях", "Лише в політичних темах"], correct: 1 },
-  { q: "Що не можна вводити в публічний ШІ-сервіс?",
-    a: ["Тему заняття", "Загальні питання про методику", "Персональні дані учнів: прізвища, оцінки, характеристики", "Прохання дати ідеї для вправи"], correct: 2 },
-  { q: "Учень здав роботу, повністю написану ШІ, як свою. Що доречніше?",
-    a: ["Нічого — ШІ можна всім", "Одразу поставити 0 без розмови", "Звіритися з правилами закладу, поговорити з учнем і домовитися чесно вказувати ШІ", "Перевірити детектором і на цьому вирішити"], correct: 2 },
-  { q: "Чи можна покладатися на детектори ШІ-тексту?",
-    a: ["Так, вони не помиляються", "Ні, вони часто помиляються, тож не можуть бути єдиним доказом", "Так, для коротких текстів", "Так, але лише для англійської"], correct: 1 }
-];
-
-// ----- Словничок -----
-const GLOSSARY = [
-  ["ШІ (штучний інтелект)", "Програми, які вміють робити те, для чого зазвичай потрібна людина: писати тексти, розпізнавати картинки, відповідати на питання."],
-  ["Запит (промпт)", "Те, що ви пишете ШІ. Чим більше подробиць (для кого, навіщо, у якому вигляді), тим краща відповідь."],
-  ["Формула хорошого запиту", "Роль → контекст → завдання → формат → критерії. Наприклад: «Ти вчитель фізики. Група 2 курсу, слабкий рівень. Склади 5 задач. Таблицею. З відповідями»."],
-  ["Галюцинація", "Коли ШІ впевнено пише неправду: вигадує факти, цифри чи джерела. Тому все важливе треба перевіряти."],
-  ["Упередженість", "ШІ може повторювати стереотипи, бо вчився на текстах людей, у яких вони трапляються."],
-  ["Маршрут", "Ваш шлях курсом: А, Б або В. Відрізняється кількістю підказок і складністю завдань, а не темами."],
-  ["Світлофор ШІ", "Пам'ятка: зелене — можна сміливо, жовте — тільки після перевірки, червоне — не можна."],
-  ["Міжпредметне завдання", "Завдання, для якого потрібні знання з кількох предметів одразу. Наприклад, розрахувати кошторис ремонту: математика + технологія + економіка."],
-  ["СЕЕН", "Соціально-емоційне та етичне навчання. Короткі вправи на початку зустрічі, які допомагають зосередитися і зняти напругу."],
-  ["Padlet", "Онлайн-дошка, на яку всі учасники можуть додавати записи й картинки."],
-  ["Академічна доброчесність", "Чесність у навчанні. Щодо ШІ — це чесно казати, де і як ви ним користувалися."],
-  ["Персональні дані", "Будь-що, за чим можна впізнати людину: прізвище, оцінки, фото, характеристика. У публічні ШІ-сервіси їх не вводять."]
-];
-
-const TYPE_LABEL = { meet: "Зустріч у Zoom", self: "Самостійно", consult: "Консультація", live: "Очна зустріч" };
-
-// =============================================================
-//  ЗБЕРЕЖЕННЯ В БРАУЗЕРІ (маршрут і виконані кроки)
-// =============================================================
-const store = {
-  get(key, fallback) {
-    try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); }
-    catch (e) { return fallback; }
-  },
-  set(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
-  }
-};
-let myRoute = store.get("course-route", null);
-let done = store.get("course-done", {});            // { "m1-0": true, ... }
-let openModule = store.get("course-open", "m0");
 
 const $ = (id) => document.getElementById(id);
-const allSteps = () => MODULES.flatMap((m) => m.steps.map((s, i) => ({ m, i, key: m.id + "-" + i })));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtH = (h) => String(h).replace(".", ",");
+
+// =============================================================
+//  СТАН КОРИСТУВАЧА
+//  Без входу — зберігається в браузері.
+//  Після входу — у хмарі (Firebase) і копія в браузері.
+// =============================================================
+const emptyState = () => ({
+  name: "", subject: "", route: null, score: null, finalScore: null,
+  done: {}, checks: {}, quiz: {}, completedAt: null
+});
+
+const local = {
+  get(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+};
+
+function loadGuest() {
+  const saved = local.get("course-state");
+  if (saved) return { ...emptyState(), ...saved };
+  // перенесення прогресу зі старої версії сайту
+  const s = emptyState();
+  s.route = local.get("course-route");
+  s.done = local.get("course-done") || {};
+  return s;
+}
+
+let user = null;              // { uid, email } після входу
+let state = loadGuest();
+let openModule = local.get("course-open") || "m0";
+let viewRoute = null;         // яку картку маршруту показано в модулі
+
+function save() {
+  if (user) {
+    local.set("course-state-" + user.uid, state);
+    if (window.Cloud && window.Cloud.enabled) window.Cloud.save(state);
+  } else {
+    local.set("course-state", state);
+  }
+}
+
+// =============================================================
+//  ПРОГРЕС І ЗНАЧКИ
+// =============================================================
+const stepKey = (m, i) => m.id + "-" + i;
+const allSteps = () => MODULES.flatMap((m) => m.steps.map((s, i) => ({ m, i, key: stepKey(m, i) })));
+const moduleProgress = (m) => {
+  const n = m.steps.filter((s, i) => state.done[stepKey(m, i)]).length;
+  return { n, total: m.steps.length, complete: n === m.steps.length };
+};
+const earnedBadges = () => MODULES.filter((m) => moduleProgress(m).complete).map((m) => m.id);
+const courseComplete = () => MODULES.every((m) => moduleProgress(m).complete);
+const inFinalStage = () => MODULES.slice(0, 6).every((m) => moduleProgress(m).complete);
+
+// Змінює стан і показує нові значки
+function update(fn) {
+  const before = earnedBadges();
+  fn();
+  if (courseComplete() && !state.completedAt) state.completedAt = new Date().toISOString();
+  save();
+  const fresh = earnedBadges().filter((id) => !before.includes(id));
+  if (fresh.length) {
+    const b = BADGES[fresh[0]];
+    toast(`${b.icon} Новий значок: «${b.name}»`);
+  }
+  renderAll();
+}
+
+let toastTimer;
+function toast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+}
 
 // =============================================================
 //  ВКЛАДКИ
 // =============================================================
-const TABS = ["home", "modules", "routes", "test", "help"];
+const TABS = ["home", "modules", "routes", "test", "resources", "glossary", "help", "account", "certificate", "privacy"];
 
+let firstShow = true;
 function showTab(name) {
-  if (!TABS.includes(name)) name = "home";
+  if (!TABS.includes(name)) {
+    // посилання на блок усередині «Ресурсів»
+    if (name && name.startsWith("res-") && $(name)) { showTab("resources"); $(name).scrollIntoView({ behavior: "smooth" }); return; }
+    name = "home";
+  }
   TABS.forEach((t) => { $("panel-" + t).hidden = t !== name; });
   document.querySelectorAll(".nav-tab").forEach((b) => {
     const on = b.dataset.tab === name;
     b.classList.toggle("is-active", on);
     b.setAttribute("aria-selected", on);
   });
-  if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+  if (name === "certificate") renderCertificate();
+  if (location.hash !== "#" + name) history[firstShow ? "replaceState" : "pushState"](null, "", "#" + name);
+  firstShow = false;
   window.scrollTo({ top: 0 });
 }
 
@@ -245,127 +111,275 @@ document.addEventListener("click", (e) => {
   const go = e.target.closest("[data-go]");
   if (go) { e.preventDefault(); showTab(go.dataset.go); }
 });
-window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
+window.addEventListener("popstate", () => showTab(location.hash.slice(1)));
+
+function openModuleTab(id) {
+  openModule = id;
+  local.set("course-open", id);
+  viewRoute = null;
+  renderModules();
+  showTab("modules");
+}
 
 // =============================================================
-//  МІЙ КУРС (панель на головній)
+//  МІЙ КУРС (кабінет)
 // =============================================================
 function renderDashboard() {
+  const first = (state.name || "").trim().split(/\s+/)[0];
+  $("home-title").textContent = first ? `Вітаємо, ${first}!` : "Вітаємо на курсі!";
+  $("guest-banner").hidden = !!user || !(window.Cloud && window.Cloud.enabled);
+
   const steps = allSteps();
-  const count = steps.filter((s) => done[s.key]).length;
+  const count = steps.filter((s) => state.done[s.key]).length;
   const percent = Math.round((count / steps.length) * 100);
   $("dash-progress").textContent = percent + " %";
   $("dash-bar").style.width = percent + "%";
   $("dash-progress-text").textContent = `Виконано ${count} з ${steps.length} кроків`;
+  $("dash-scores").textContent = state.score === null ? ""
+    : `Тест на початку: ${state.score}/12` + (state.finalScore !== null ? ` · наприкінці: ${state.finalScore}/12` : "");
 
-  if (myRoute) {
-    $("dash-route").textContent = ROUTES[myRoute].short;
-    $("dash-route-text").textContent = ROUTES[myRoute].tip;
-    $("dash-route-btn").textContent = "Про мій маршрут";
-    $("dash-route-btn").dataset.go = "routes";
+  const rBtn = $("dash-route-btn");
+  if (state.route) {
+    $("dash-route").textContent = ROUTES[state.route].short;
+    $("dash-route-text").textContent = ROUTES[state.route].tip;
+    rBtn.textContent = "Про мій маршрут";
+    rBtn.dataset.go = "routes";
+  } else {
+    $("dash-route").textContent = "Ще не визначено";
+    $("dash-route-text").textContent = "Пройдіть короткий тест, і ми підберемо завдання під ваш рівень.";
+    rBtn.textContent = "Пройти тест";
+    rBtn.dataset.go = "test";
   }
 
-  // наступний крок: перший невиконаний
-  const next = steps.find((s) => !done[s.key]);
+  const next = steps.find((s) => !state.done[s.key]);
   const btn = $("dash-next-btn");
-  if (!myRoute) {
+  if (!state.route) {
     $("dash-next").textContent = "Пройти вхідний тест";
     $("dash-next-module").textContent = "Модуль М0 · 10 хвилин";
     btn.onclick = () => showTab("test");
   } else if (next) {
     $("dash-next").textContent = next.m.steps[next.i].title;
     $("dash-next-module").textContent = `${next.m.code} · ${next.m.title}`;
-    btn.onclick = () => { openModule = next.m.id; store.set("course-open", openModule); renderModules(); showTab("modules"); };
+    btn.onclick = () => openModuleTab(next.m.id);
   } else {
     $("dash-next").textContent = "Курс пройдено!";
-    $("dash-next-module").textContent = "Вітаємо з завершенням";
-    btn.onclick = () => showTab("modules");
+    $("dash-next-module").textContent = "Вітаємо із завершенням";
+    btn.onclick = () => showTab("certificate");
   }
+
+  // прогрес по модулях
+  $("mod-progress").innerHTML = MODULES.map((m) => {
+    const p = moduleProgress(m);
+    return `<button class="mp ${p.complete ? "is-done" : ""}" data-module="${m.id}">
+      <span class="mp__code">${m.code}</span>
+      <span class="mp__body"><b>${m.title}</b>
+        <span class="progress progress--thin"><span class="progress__bar" style="width:${(p.n / p.total) * 100}%"></span></span>
+      </span>
+      <span class="muted small">${p.n}/${p.total}</span>
+    </button>`;
+  }).join("");
+
+  // значки
+  const got = earnedBadges();
+  $("badges").innerHTML = MODULES.map((m) => {
+    const b = BADGES[m.id], on = got.includes(m.id);
+    return `<div class="badge-card ${on ? "is-on" : ""}" title="${on ? "Отримано" : "Завершіть модуль " + m.code}">
+      <span class="badge-card__icon">${on ? b.icon : "🔒"}</span>
+      <b>${b.name}</b><span class="muted small">${m.code}</span></div>`;
+  }).join("");
+
+  // свідоцтво
+  $("cert-teaser").innerHTML = courseComplete()
+    ? `<div class="banner banner--ok"><div><b>🎓 Курс завершено!</b> Ваше свідоцтво про проходження курсу готове.</div><button class="btn btn--small" data-go="certificate">Відкрити свідоцтво</button></div>`
+    : `<div class="banner"><div><b>🎓 Свідоцтво про проходження курсу</b> стане доступним, коли всі кроки буде виконано (зараз ${percent} %).</div></div>`;
 }
 
 function renderTimeline() {
   $("timeline").innerHTML = MODULES.map((m) => `
     <li><span class="timeline__week">${m.weeks}</span>
       <button class="timeline__link" data-module="${m.id}">${m.code} · ${m.title}</button>
-      <span class="muted small">${m.hours} год</span></li>`).join("");
+      <span class="muted small">${fmtH(m.hours[0])} год</span></li>`).join("");
 }
-$("timeline").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-module]");
-  if (b) { openModule = b.dataset.module; store.set("course-open", openModule); renderModules(); showTab("modules"); }
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".timeline [data-module], .mod-progress [data-module]");
+  if (b) openModuleTab(b.dataset.module);
 });
 
 // =============================================================
 //  МОДУЛІ
 // =============================================================
-function moduleProgress(m) {
-  const n = m.steps.filter((s, i) => done[m.id + "-" + i]).length;
-  return { n, total: m.steps.length };
-}
-
 function renderModules() {
   $("module-list").innerHTML = MODULES.map((m) => {
     const p = moduleProgress(m);
-    const complete = p.n === p.total;
     return `<li><button class="module-item ${m.id === openModule ? "is-active" : ""}" data-module="${m.id}">
-      <span class="module-item__code ${complete ? "is-done" : ""}">${complete ? "✓" : m.code}</span>
+      <span class="module-item__code ${p.complete ? "is-done" : ""}">${p.complete ? "✓" : m.code}</span>
       <span class="module-item__text"><b>${m.title}</b><span class="muted small">${m.weeks} · ${p.n}/${p.total}</span></span>
     </button></li>`;
   }).join("");
 
   const m = MODULES.find((x) => x.id === openModule) || MODULES[0];
-  const routeTip = myRoute ? `<p class="tip"><b>Порада для маршруту ${ROUTES[myRoute].short}:</b> ${ROUTES[myRoute].tip}</p>` : "";
+  const [total, theory, practice, self] = m.hours;
+  const p = moduleProgress(m);
+  const routeTip = state.route ? `<p class="tip"><b>Порада для маршруту ${ROUTES[state.route].short}:</b> ${ROUTES[state.route].tip}</p>` : "";
+
+  const hoursRow = [
+    theory ? `теорія ${fmtH(theory)} год` : "",
+    practice ? `практика ${fmtH(practice)} год` : "",
+    self ? `самостійно ${fmtH(self)} год` : ""
+  ].filter(Boolean).join(" · ");
+
+  // Кроки
+  const stepsHtml = m.steps.map((s, i) => {
+    const key = stepKey(m, i);
+    const body = s.list
+      ? `<ul class="step__list">${s.list.map((li) => `<li>${li}</li>`).join("")}</ul>`
+      : `<p class="muted">${s.text}</p>`;
+    const action = s.action === "test" ? `<button class="btn btn--small" data-go="test">Відкрити тест</button>`
+      : s.link ? `<button class="btn btn--small btn--ghost" data-go="${s.link}">Відкрити ресурси</button>` : "";
+    return `<li class="step ${state.done[key] ? "is-done" : ""}">
+      <div class="step__head">
+        <span class="badge badge--${s.type}">${TYPE_LABEL[s.type]}</span>
+        <span class="muted small">${s.time}</span>
+      </div>
+      <h3>${s.title}</h3>
+      ${body}
+      <div class="step__foot">
+        <label class="check"><input type="checkbox" data-step="${key}" ${state.done[key] ? "checked" : ""}> Виконано</label>
+        ${action}
+      </div>
+    </li>`;
+  }).join("");
+
+  // Завдання за маршрутами
+  let routeHtml = "";
+  if (m.routeTasks) {
+    const r = viewRoute || state.route || "A";
+    const t = m.routeTasks[r];
+    routeHtml = `<details class="sec" open><summary>Завдання для вашого маршруту</summary>
+      <div class="route-tabs route-tabs--small">
+        ${["A", "B", "C"].map((id) => `<button class="route-tab ${id === r ? "is-active" : ""}" data-mroute="${id}">${ROUTES[id].short}${id === state.route ? " ★" : ""}</button>`).join("")}
+      </div>
+      <div class="route-task route-task--${r}">
+        <b>Картка ${ROUTES[r].short.split(" ")[0]} · ${t.title}</b>
+        <ol>${t.items.map((x) => `<li>${x}</li>`).join("")}</ol>
+      </div>
+      ${!state.route ? `<p class="muted small">Ваш маршрут ще не визначено. <a href="#test" data-go="test">Пройдіть тест</a>, і тут одразу відкриється ваша картка.</p>` : ""}
+    </details>`;
+  }
+
+  // Самоперевірка
+  let checkHtml = "";
+  if (m.check && m.check.quiz) {
+    const saved = state.quiz[m.id];
+    checkHtml = `<details class="sec" open><summary>Самоперевірка</summary>
+      <form class="mini-quiz" id="mini-quiz" data-module="${m.id}">
+        ${m.check.quiz.map((q, i) => `<fieldset class="question question--small">
+          <legend><span class="question__num">${i + 1}.</span>${q.q}</legend>
+          ${q.a.map((a, j) => {
+            const picked = saved && saved.answers[i] === j;
+            const mark = saved ? (j === q.correct ? "is-right" : picked ? "is-wrong" : "") : "";
+            return `<label class="option ${mark}"><input type="radio" name="mq${i}" value="${j}" ${picked ? "checked" : ""}><span>${a}</span></label>`;
+          }).join("")}
+        </fieldset>`).join("")}
+        <button class="btn" type="submit">Перевірити</button>
+        ${saved ? `<p class="quiz-score ${saved.score >= 5 ? "ok" : ""}">Результат: ${saved.score} з ${m.check.quiz.length}. ${saved.score >= 5 ? "Модуль зараховано ✓" : "Перегляньте матеріал ще раз і спробуйте знову."}</p>` : ""}
+      </form>
+    </details>`;
+  } else if (m.check && m.check.list) {
+    checkHtml = `<details class="sec" open><summary>${m.check.title || "Самоперевірка: чи готовий ваш продукт"}</summary>
+      <div class="checklist">${m.check.list.map((c, i) => {
+        const k = m.id + "-c" + i;
+        return `<label class="check check--top"><input type="checkbox" data-check="${k}" ${state.checks[k] ? "checked" : ""}> <span>${c}</span></label>`;
+      }).join("")}</div>
+    </details>`;
+  }
 
   $("module-detail").innerHTML = `
-    <span class="label">${m.code} · ${m.weeks} · ${m.hours} год</span>
+    <span class="label">${m.code} · ${m.weeks} · ${fmtH(total)} год</span>
     <h2>${m.title}</h2>
-    <p class="muted">${m.goal}</p>
+    <p class="lead">${m.goal}</p>
+    <div class="meta-row">
+      <span class="pill">${hoursRow}</span>
+      <span class="pill ${p.complete ? "pill--ok" : ""}">Виконано ${p.n} з ${p.total}</span>
+    </div>
     ${routeTip}
-    <ol class="steps">
-      ${m.steps.map((s, i) => {
-        const key = m.id + "-" + i;
-        const body = s.list
-          ? `<ul class="step__list">${s.list.map((li) => `<li>${li}</li>`).join("")}</ul>`
-          : `<p class="muted">${s.text}</p>`;
-        const action = s.action === "test" ? `<button class="btn btn--small" data-go="test">Відкрити тест</button>` : "";
-        return `<li class="step ${done[key] ? "is-done" : ""}">
-          <div class="step__head">
-            <span class="badge badge--${s.type}">${TYPE_LABEL[s.type]}</span>
-            <span class="muted small">${s.time}</span>
-          </div>
-          <h3>${s.title}</h3>
-          ${body}
-          <div class="step__foot">
-            <label class="check"><input type="checkbox" data-step="${key}" ${done[key] ? "checked" : ""}> Виконано</label>
-            ${action}
-          </div>
-        </li>`;
-      }).join("")}
-    </ol>
-    <div class="result-box"><span class="label">Що у вас буде після модуля</span><b>${m.result}</b></div>`;
+
+    <div class="two-col">
+      <div class="box"><span class="label">Після модуля ви</span>
+        <ul class="ticks">${m.outcomes.map((o) => `<li>${o}</li>`).join("")}</ul></div>
+      <div class="box"><span class="label">Ключові теми</span>
+        <ul class="dots">${m.topics.map((t) => `<li>${t}</li>`).join("")}</ul></div>
+    </div>
+
+    <details class="sec" open><summary>Як проходить модуль</summary>
+      <ol class="steps">${stepsHtml}</ol>
+    </details>
+
+    ${routeHtml}
+
+    <details class="sec"><summary>Інструменти</summary>
+      <div class="chips">${m.tools.map((t) => `<span class="chip chip--static">${t}</span>`).join("")}</div>
+      <p class="muted small">Посилання на інструменти — у розділі <a href="#resources" data-go="resources">«Ресурси»</a>.</p>
+    </details>
+
+    <div class="result-box">
+      <span class="label">Що у вас буде після модуля</span><b>${m.product}</b>
+      <span class="muted small">Як оцінюється: ${m.control}</span>
+    </div>
+
+    ${checkHtml}
+
+    <div class="module-nav">
+      ${MODULES.indexOf(m) > 0 ? `<button class="btn btn--ghost btn--small" data-module-nav="${MODULES[MODULES.indexOf(m) - 1].id}">← ${MODULES[MODULES.indexOf(m) - 1].code}</button>` : "<span></span>"}
+      ${MODULES.indexOf(m) < MODULES.length - 1 ? `<button class="btn btn--small" data-module-nav="${MODULES[MODULES.indexOf(m) + 1].id}">${MODULES[MODULES.indexOf(m) + 1].code} →</button>` : ""}
+    </div>`;
 }
 
 $("module-list").addEventListener("click", (e) => {
   const b = e.target.closest("[data-module]");
   if (!b) return;
   openModule = b.dataset.module;
-  store.set("course-open", openModule);
+  local.set("course-open", openModule);
+  viewRoute = null;
   renderModules();
   if (window.innerWidth < 860) $("module-detail").scrollIntoView({ behavior: "smooth" });
 });
 
+$("module-detail").addEventListener("click", (e) => {
+  const r = e.target.closest("[data-mroute]");
+  if (r) { viewRoute = r.dataset.mroute; renderModules(); return; }
+  const n = e.target.closest("[data-module-nav]");
+  if (n) { openModule = n.dataset.moduleNav; local.set("course-open", openModule); viewRoute = null; renderModules(); $("module-detail").scrollIntoView({ behavior: "smooth" }); }
+});
+
 $("module-detail").addEventListener("change", (e) => {
   const key = e.target.dataset.step;
-  if (!key) return;
-  if (e.target.checked) done[key] = true; else delete done[key];
-  store.set("course-done", done);
-  renderModules();
-  renderDashboard();
+  const chk = e.target.dataset.check;
+  if (key) update(() => { if (e.target.checked) state.done[key] = true; else delete state.done[key]; });
+  if (chk) update(() => { if (e.target.checked) state.checks[chk] = true; else delete state.checks[chk]; });
+});
+
+$("module-detail").addEventListener("submit", (e) => {
+  if (e.target.id !== "mini-quiz") return;
+  e.preventDefault();
+  const m = MODULES.find((x) => x.id === e.target.dataset.module);
+  const data = new FormData(e.target);
+  const answers = m.check.quiz.map((q, i) => data.get("mq" + i) === null ? null : Number(data.get("mq" + i)));
+  if (answers.includes(null)) { toast("Дайте відповідь на всі питання"); return; }
+  const score = answers.filter((a, i) => a === m.check.quiz[i].correct).length;
+  update(() => {
+    state.quiz[m.id] = { answers, score };
+    const idx = m.steps.findIndex((s) => s.title === "Самоперевірка");
+    if (idx >= 0 && score >= 5) state.done[stepKey(m, idx)] = true;
+  });
 });
 
 // =============================================================
 //  МАРШРУТИ
 // =============================================================
+let shownRoute = "B";
 function showRoute(id) {
+  shownRoute = id;
   const r = ROUTES[id];
   $("route-score").textContent = r.score;
   $("route-name").textContent = r.name;
@@ -373,9 +387,16 @@ function showRoute(id) {
   $("route-tasks").textContent = r.tasks;
   $("route-support").textContent = r.support;
   $("route-role").textContent = r.role;
-  document.querySelectorAll(".route-tab").forEach((t) => t.classList.toggle("is-active", t.dataset.route === id));
+  const mine = state.route === id;
+  $("route-choose").textContent = mine ? "Це ваш маршрут ✓" : "Обрати цей маршрут";
+  $("route-choose").disabled = mine;
+  document.querySelectorAll("#panel-routes .route-tab").forEach((t) => t.classList.toggle("is-active", t.dataset.route === id));
 }
-document.querySelectorAll(".route-tab").forEach((t) => t.addEventListener("click", () => showRoute(t.dataset.route)));
+document.querySelectorAll("#panel-routes .route-tab").forEach((t) => t.addEventListener("click", () => showRoute(t.dataset.route)));
+$("route-choose").addEventListener("click", () => {
+  update(() => { state.route = shownRoute; });
+  toast("Маршрут змінено: " + ROUTES[shownRoute].short);
+});
 
 // =============================================================
 //  ТЕСТ
@@ -407,24 +428,110 @@ form.addEventListener("submit", (e) => {
     else mistakes.push(`<li><b>${item.q}</b><br>Правильно: ${item.a[item.correct]}</li>`);
   });
 
-  myRoute = score <= 4 ? "A" : score <= 8 ? "B" : "C";
-  store.set("course-route", myRoute);
-  done["m0-1"] = true;                          // крок «Вхідний тест» виконано
-  store.set("course-done", done);
+  const final = inFinalStage();   // перед «Галереєю проєктів» тест — вихідна діагностика
+  update(() => {
+    if (final) {
+      state.finalScore = score;
+      state.done["m6-1"] = true;
+    } else {
+      state.score = score;
+      state.route = score <= 4 ? "A" : score <= 8 ? "B" : "C";
+      state.done["m0-1"] = true;
+    }
+  });
 
-  const r = ROUTES[myRoute];
-  $("test-result").innerHTML = `
-    <div class="result__score">${score} / ${QUESTIONS.length}</div>
-    <h2>${r.name}</h2>
-    <p class="muted">${r.who} Викладач перегляне результат і підтвердить маршрут.</p>
-    ${mistakes.length ? `<h3>Варто повторити</h3><ul class="mistakes">${mistakes.join("")}</ul>` : "<p>Усі відповіді правильні!</p>"}
-    <div class="result__buttons">
-      <button class="btn" data-go="modules">До модулів</button>
-      <button class="btn btn--ghost" data-go="home">На головну</button>
-    </div>`;
+  const r = ROUTES[state.route];
+  $("test-result").innerHTML = final
+    ? `<div class="result__score">${score} / ${QUESTIONS.length}</div>
+       <h2>Вихідна діагностика</h2>
+       <p class="muted">На початку курсу: ${state.score ?? "—"} з 12. Зараз: ${score} з 12.</p>
+       ${mistakes.length ? `<h3>Варто повторити</h3><ul class="mistakes">${mistakes.join("")}</ul>` : "<p>Усі відповіді правильні!</p>"}
+       <div class="result__buttons"><button class="btn" data-go="home">До мого курсу</button></div>`
+    : `<div class="result__score">${score} / ${QUESTIONS.length}</div>
+       <h2>${r.name}</h2>
+       <p class="muted">${r.who} Викладач перегляне результат і підтвердить маршрут.</p>
+       ${mistakes.length ? `<h3>Варто повторити</h3><ul class="mistakes">${mistakes.join("")}</ul>` : "<p>Усі відповіді правильні!</p>"}
+       <div class="result__buttons">
+         <button class="btn" data-go="modules">До модулів</button>
+         <button class="btn btn--ghost" data-go="home">На головну</button>
+       </div>`;
   $("test-result").hidden = false;
   $("test-result").scrollIntoView({ behavior: "smooth" });
-  renderAll();
+});
+
+function renderTestLead() {
+  $("test-lead").textContent = inFinalStage()
+    ? "Вихідна діагностика: ті самі 12 питань, що й на початку. Порівняємо, що змінилося."
+    : "12 коротких питань, близько 10 хвилин. Це не оцінка: тест лише допомагає підібрати ваш маршрут.";
+}
+
+// =============================================================
+//  РЕСУРСИ
+// =============================================================
+function renderResources() {
+  $("resources").innerHTML = `
+    <section class="res" id="res-traffic">
+      <h2 class="section-title">Пам'ятка «Світлофор ШІ»</h2>
+      <div class="traffic">
+        <div class="traffic__col traffic__col--green"><b>🟢 Можна</b><ul>${TRAFFIC.green.map((x) => `<li>${x}</li>`).join("")}</ul></div>
+        <div class="traffic__col traffic__col--yellow"><b>🟡 Обережно: лише після перевірки</b><ul>${TRAFFIC.yellow.map((x) => `<li>${x}</li>`).join("")}</ul></div>
+        <div class="traffic__col traffic__col--red"><b>🔴 Не можна</b><ul>${TRAFFIC.red.map((x) => `<li>${x}</li>`).join("")}</ul></div>
+      </div>
+      <p class="tip"><b>Головне правило:</b> довіряй, але перевіряй. Жоден матеріал від ШІ не потрапляє до учнів без перевірки педагогом.</p>
+    </section>
+
+    <section class="res" id="res-prompt">
+      <h2 class="section-title">Як скласти якісний запит</h2>
+      <div class="formula">
+        ${[["Роль", "ким має бути ШІ?"], ["Контекст", "для кого?"], ["Завдання", "що створити?"], ["Формат", "як подати?"], ["Критерії", "що обов'язково?"]]
+          .map(([a, b], i) => `<div class="formula__item"><span>${i + 1}</span><b>${a}</b><small>${b}</small></div>`).join("")}
+      </div>
+      <h3 class="sub">Готові запити — скопіюйте і замініть слова в [дужках]</h3>
+      <div class="prompts">
+        ${PROMPTS.map((p, i) => `<div class="prompt"><div class="prompt__head"><b>${p.title}</b>
+          <button class="btn btn--small btn--ghost" data-copy="${i}">Копіювати</button></div><p>${p.text}</p></div>`).join("")}
+      </div>
+      <h3 class="sub">Фрази-підсилювачі</h3>
+      <ul class="boosters">${BOOSTERS.map(([a, b]) => `<li><b>${a}</b> — ${b}</li>`).join("")}</ul>
+    </section>
+
+    <section class="res" id="res-errors">
+      <h2 class="section-title">6 типів помилок ШІ</h2>
+      <div class="errors">${ERROR_TYPES.map(([t, w, h], i) => `<div class="err"><span class="err__n">${i + 1}</span><b>${t}</b><p class="muted">${w}</p><p><b>Перевірка:</b> ${h}</p></div>`).join("")}</div>
+      <p class="tip"><b>Як запобігти:</b> у запиті вказуйте клас і рівень, просіть розв'язання і джерела, забороняйте вигадувати факти. Результат завжди перевіряйте за чек-листом. Детектори ШІ-тексту помиляються, тому не можуть бути єдиним доказом.</p>
+    </section>
+
+    <section class="res" id="res-agreement">
+      <h2 class="section-title">Шаблон «Домовленість з класом про використання ШІ»</h2>
+      <div class="agreement">${AGREEMENT.map(([a, b]) => `<div><b>${a}</b><p class="muted">${b}</p></div>`).join("")}</div>
+    </section>
+
+    <section class="res" id="res-tools">
+      <h2 class="section-title">Яким інструментом зробити</h2>
+      <div class="tools">${TOOLS.map(([task, name, url]) => `<a class="tool" href="${url}" target="_blank" rel="noopener"><span class="muted small">${task}</span><b>${name} ↗</b></a>`).join("")}</div>
+      <h3 class="sub">П'ять запитань перед вибором інструмента</h3>
+      <ol class="boosters">
+        <li>Для якої задачі? (текст, зображення, відео, вправа)</li>
+        <li>Чи впорається те, що в мене вже є?</li>
+        <li>Чи є безкоштовна версія і які в неї обмеження?</li>
+        <li>Чи коректно працює українська — і в запиті, і в результаті?</li>
+        <li>Чи можна давати учням (вік, захист даних)?</li>
+      </ol>
+    </section>`;
+}
+document.addEventListener("click", (e) => {
+  const c = e.target.closest("[data-copy]");
+  if (!c) return;
+  const text = PROMPTS[Number(c.dataset.copy)].text;
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(() => toast("Запит скопійовано"))
+    .catch(() => toast("Не вдалося скопіювати: виділіть текст вручну"));
+});
+document.addEventListener("click", (e) => {
+  const a = e.target.closest(".res-nav a");
+  if (!a) return;
+  e.preventDefault();
+  $(a.getAttribute("href").slice(1)).scrollIntoView({ behavior: "smooth" });
 });
 
 // =============================================================
@@ -440,14 +547,176 @@ function renderGlossary(filter = "") {
 $("help-search").addEventListener("input", (e) => renderGlossary(e.target.value));
 
 // =============================================================
+//  ДОПОМОГА: контакти, відгук, FAQ
+// =============================================================
+function renderHelp() {
+  const S = window.SITE;
+  $("contacts").innerHTML = `
+    <span class="label">Зв'язатися з викладачем</span>
+    <b class="next">${esc(S.leader)}</b>
+    <p><a href="mailto:${esc(S.email)}">✉️ ${esc(S.email)}</a></p>
+    <p class="muted"><b>Консультації:</b> ${esc(S.consultations)}</p>
+    ${S.chatLink ? `<a class="btn btn--small btn--ghost" href="${esc(S.chatLink)}" target="_blank" rel="noopener">💬 ${esc(S.chatName)}</a>` : ""}
+    <p class="muted small">Відповідаємо протягом 1–2 робочих днів.</p>`;
+  const fb = $("feedback-btn");
+  fb.href = S.feedbackForm || `mailto:${S.email}?subject=${encodeURIComponent("Відгук про курс")}`;
+  $("faq").innerHTML = FAQ.map(([q, a]) => `<details class="term"><summary>${q}</summary><p>${a}</p></details>`).join("");
+  $("footer-left").textContent = `Курс розробила ${S.leader}` + (S.startDate ? ` · Старт: ${S.startDate}` : "");
+}
+
+// =============================================================
+//  СВІДОЦТВО
+// =============================================================
+function renderCertificate() {
+  const box = $("certificate");
+  if (!courseComplete()) {
+    const p = Math.round(allSteps().filter((s) => state.done[s.key]).length / allSteps().length * 100);
+    box.innerHTML = `<div class="narrow"><h1 class="page-title">Свідоцтво</h1>
+      <p class="page-lead">Свідоцтво стане доступним, коли всі кроки курсу буде позначено як виконані. Зараз виконано ${p} %.</p>
+      <button class="btn" data-go="modules">До модулів</button></div>`;
+    return;
+  }
+  const date = new Date(state.completedAt || Date.now()).toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric" });
+  box.innerHTML = `
+    <div class="cert-tools no-print">
+      ${!state.name ? `<label class="field">Ваше ім'я та прізвище для свідоцтва<input type="text" id="cert-name" maxlength="80"></label>` : ""}
+      <button class="btn" onclick="window.print()">Роздрукувати або зберегти PDF</button>
+    </div>
+    <div class="cert">
+      <div class="cert__mark">ШІ</div>
+      <p class="cert__kind">Свідоцтво</p>
+      <p class="cert__small">засвідчує, що</p>
+      <p class="cert__name" id="cert-name-out">${esc(state.name) || "&nbsp;"}</p>
+      <p class="cert__small">успішно завершив(ла) навчання за програмою курсу</p>
+      <p class="cert__course">«${esc(window.SITE.courseName)}»</p>
+      <p class="cert__small">обсягом 30 годин (1 кредит ЄКТС)${state.route ? `, маршрут ${ROUTES[state.route].short.split(" ")[0]}` : ""}</p>
+      <div class="cert__badges">${MODULES.map((m) => `<span title="${BADGES[m.id].name}">${BADGES[m.id].icon}</span>`).join("")}</div>
+      <div class="cert__foot"><span>Ведуча курсу: ${esc(window.SITE.leader)}</span><span>${date}</span></div>
+    </div>`;
+  const inp = $("cert-name");
+  if (inp) inp.addEventListener("input", () => { $("cert-name-out").textContent = inp.value || " "; });
+}
+
+// =============================================================
+//  АКАУНТ: зв'язок з auth.js
+// =============================================================
+function renderAccount() {
+  const enabled = window.Cloud && window.Cloud.enabled;
+  $("auth-off").hidden = enabled !== false;
+  $("auth-forms").hidden = !!user || enabled === false;
+  $("profile").hidden = !user;
+  const label = user ? ((state.name || "").trim().split(/\s+/)[0] || "Кабінет") : "Увійти";
+  $("account-label").textContent = label;
+  $("account-avatar").textContent = user ? (state.name || user.email || "?").trim()[0].toUpperCase() : "?";
+  $("account-btn").classList.toggle("is-in", !!user);
+  if (user) {
+    $("profile-email").value = user.email || "";
+    const f = $("form-profile");
+    if (document.activeElement.form !== f) { f.name.value = state.name || ""; f.subject.value = state.subject || ""; }
+  }
+}
+
+document.querySelectorAll("[data-auth]").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-auth]").forEach((x) => x.classList.toggle("is-active", x === b));
+  $("form-login").hidden = b.dataset.auth !== "login";
+  $("form-register").hidden = b.dataset.auth !== "register";
+  authMsg("");
+}));
+
+function authMsg(text, ok) {
+  $("auth-msg").textContent = text;
+  $("auth-msg").classList.toggle("ok", !!ok);
+}
+
+function cloudReady() {
+  if (window.Cloud && window.Cloud.enabled) return true;
+  authMsg("Реєстрація тимчасово недоступна. Спробуйте пізніше або напишіть викладачу.");
+  return false;
+}
+
+function busy(formEl, on) { formEl.querySelectorAll("button").forEach((b) => { b.disabled = on; }); }
+
+$("form-login").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (!cloudReady()) return;
+  busy(f, true); authMsg("Входимо…", true);
+  try { await window.Cloud.login(f.email.value.trim(), f.password.value); authMsg(""); f.reset(); showTab("home"); }
+  catch (err) { authMsg(window.Cloud.errorText(err)); }
+  busy(f, false);
+});
+
+$("form-register").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (!cloudReady()) return;
+  busy(f, true); authMsg("Створюємо акаунт…", true);
+  try {
+    await window.Cloud.register({ name: f.name.value.trim(), subject: f.subject.value.trim(), email: f.email.value.trim(), password: f.password.value });
+    authMsg(""); f.reset(); showTab("home");
+    toast("Акаунт створено. Ласкаво просимо!");
+  } catch (err) { authMsg(window.Cloud.errorText(err)); }
+  busy(f, false);
+});
+
+$("forgot-btn").addEventListener("click", async () => {
+  const email = $("form-login").email.value.trim();
+  if (!cloudReady()) return;
+  if (!email) { authMsg("Введіть email у поле вище, і ми надішлемо посилання для зміни пароля."); return; }
+  try { await window.Cloud.reset(email); authMsg("Лист для зміни пароля надіслано. Перевірте пошту (і папку «Спам»).", true); }
+  catch (err) { authMsg(window.Cloud.errorText(err)); }
+});
+
+$("form-profile").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = e.target;
+  update(() => { state.name = f.name.value.trim(); state.subject = f.subject.value.trim(); });
+  $("profile-msg").textContent = "Збережено ✓";
+  setTimeout(() => { $("profile-msg").textContent = ""; }, 2500);
+});
+
+$("logout-btn").addEventListener("click", async () => {
+  await window.Cloud.logout();
+  showTab("home");
+  toast("Ви вийшли з акаунта");
+});
+
+// Викликає auth.js, коли користувач увійшов або вийшов
+window.App = {
+  // cloud — дані з хмари (або null, якщо акаунт новий)
+  onAuth(u, cloud, profile) {
+    user = u;
+    if (u) {
+      if (cloud) {
+        state = { ...emptyState(), ...cloud };
+      } else {
+        // новий акаунт: забираємо прогрес, зроблений без входу
+        state = { ...emptyState(), ...loadGuest(), ...(profile || {}) };
+        save();
+      }
+    } else {
+      state = loadGuest();
+    }
+    renderAll();
+  },
+  cached(uid) { return local.get("course-state-" + uid); },
+  saveError(text) { toast("⚠️ " + text); },
+  setCloudStatus() { renderAccount(); renderDashboard(); }
+};
+
+// =============================================================
 //  ЗАПУСК
 // =============================================================
 function renderAll() {
   renderDashboard();
   renderModules();
-  showRoute(myRoute || "B");
+  renderAccount();
+  renderTestLead();
+  showRoute(state.route || shownRoute);
 }
 renderTimeline();
 renderGlossary();
+renderResources();
+renderHelp();
 renderAll();
 showTab(location.hash.slice(1) || "home");
